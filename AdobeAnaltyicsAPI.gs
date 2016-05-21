@@ -36,7 +36,7 @@ var AdobeAnalyticsAPIController = (function() {
   function AdobeAnalyticsAPIController() {
 
     this.token_key = ""; //API Token key
-    this.setDebug = true; // if true, output log.
+    this.setDebug = false; // if true, output log.
 
     //initialize spreadsheet
     this.initializeSpreadsheet();
