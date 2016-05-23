@@ -1,4 +1,4 @@
-# AdobeAnalyticsAPIforGAS
+# AdobeAnalytics API Controller for Google Apps Script
 
 (日本語は下に書いておきました)
 
