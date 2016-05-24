@@ -2,7 +2,7 @@
 // Adobe Analtyics API Controller Library
 //
 // @language Google Apps Script
-// @write manji6 <https://github.com/manji6>
+// @created manji6 <https://github.com/manji6/>
 // =====================================
 
 
@@ -190,6 +190,8 @@ var AdobeAnalyticsAPIController = (function() {
    * @param {Object} data Props data object
    **/
   AdobeAnalyticsAPIController.prototype.sortPropsData = function(data) {
+
+    var data_array = [];
 
     // set Title Header Line.
     var data_title = ["ID", "Name", "Enabled", "Pathing Enabled", "List Enabled", "Participation Enabled"];
@@ -521,19 +523,23 @@ var AdobeAnalyticsAPIController = (function() {
 function myFunction() {
   var adobeAnalyticsController = new AdobeAnalyticsAPIController();
 
-  // save eVar
+  // save eVar,prop,events sheet
+  //adobeAnalyticsController.saveSDR();
+
+  // get eVar data and save eVar sheet
   //adobeAnalyticsController.saveEvarsList();
 
-  // save prop
+  // save prop data and save prop sheet
   //adobeAnalyticsController.savePropsList();
 
-  // save events
+  // save events data and save events sheet
   //adobeAnalyticsController.saveEventsList();
 
-  // get segments list & save
-  //adobeAnalyticsController.saveSegmentsList({"filters":{"reportSuiteID": "swdsawadasjdev,swdsawadasjprd"}});
 
-  // save segments data
+  // get segments data and save segments sheet
+  //adobeAnalyticsController.saveSegmentsList();
+
+  // update segments data from segments sheet
   //adobeAnalyticsController.saveSegments();
 
 }
