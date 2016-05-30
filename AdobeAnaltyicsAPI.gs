@@ -414,12 +414,19 @@ var AdobeAnalyticsAPIController = (function() {
     for (var i in sheet_segments_data) {
       if (sheet_segments_data[i][1]) {
 
+        var request_api_tags = null;
+        if(sheet_segments_data[i][7]){
+          request_api_tags = sheet_segments_data[i][7].split(",");
+        }
+
         var request_api = {
           "definition": JSON.parse(sheet_segments_data[i][6]),
           "name": sheet_segments_data[i][1],
           "reportSuiteID": sheet_segments_data[i][5],
-          "Description": sheet_segments_data[i][2]
+          "description": sheet_segments_data[i][2],
+          "tags": request_api_tags
         };
+
 
         // if segment id is set, segment data is update referrer spreadsheet's data.
         if (sheet_segments_data[i][0]) {
@@ -537,6 +544,7 @@ function myFunction() {
 
 
   // get segments data and save segments sheet
+  //   request setting: https://marketing.adobe.com/developer/documentation/segments-1-4/r-get-1
   //adobeAnalyticsController.saveSegmentsList();
 
   // update segments data from segments sheet
