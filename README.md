@@ -22,7 +22,14 @@ but, this is very easy to use. So, please download code and have fun!
   - please get secretkey & username.
 
 ### Adobe Developer Connection
+Please regist Adobe Developer account & create application
 - [Create an application](https://marketing.adobe.com/developer/documentation/authentication-1/auth-register-app-1)
+  - please select target organizations.
+  - please add "Reportsuite" and "Report" Scope.
+
+> if you can't find organizations, your adobe ID don't added marketing cloud organizations.
+> Please contact account administrator and request Adobe marketing cloud invitation.
+
 
 
 ## Usage
@@ -105,7 +112,13 @@ update segments data from "segments" spreadsheet.
   - アカウントとアプリケーションを作成したら、シークレットキーとユーザーIDをメモしておいてください。
 
 ### Adobe Developer Connection
+Adobe Developer Accountの作成とApplicationの登録をしてください。
 - [Create an application](https://marketing.adobe.com/developer/documentation/authentication-1/auth-register-app-1)
+  - 実行する対象となる組織を選択してください。
+  - Scopeに "Reportsuite" と "Report" を追加してください。
+
+> もし組織が見当たらない場合、あなたのAdobe IDはまだ該当のMarketing Cloud 組織に登録されていない可能性があります。
+> 自社のAdobe Markting Cloud 管理者に連絡し、自分のメールアドレスを招待してもらってください。
 
 
 ## Usage
