@@ -9,7 +9,7 @@
 // Configuration: Obtain AdobeAnalytics web API token
 var API_TOKEN = "https://api.omniture.com/";
 var API_ENDPOINT = "https://api.omniture.com/admin/1.4/rest/";
-var SPREADSHEET_SHEETLIST = ["prop","eVar","events","segments"];
+var SPREADSHEET_SHEETLIST = ["prop","eVar","events","segments","RSID"];
 var API_USERNAME = PropertiesService.getScriptProperties().getProperty('Analytics_api_username');
 var API_SECRETKEY = PropertiesService.getScriptProperties().getProperty('Analytics_api_secretkey');
 var FILE_SPREADSHEET = PropertiesService.getScriptProperties().getProperty('spreadsheet_path');
@@ -438,6 +438,57 @@ var AdobeAnalyticsAPIController = (function() {
     }
   }
 
+
+  /**
+   * AdobeAnalyticsAPIController.prototype.saveRSIDList()
+   * get event List from define RSID & save Spreadsheet.
+   *
+   **/
+  AdobeAnalyticsAPIController.prototype.saveRSIDList = function() {
+
+    // get eventsList
+    var rsidList = this.execRequest("Company.GetReportSuites");
+    
+    var rsidList = this.sortRSIDData(rsidList);
+
+    this.saveSpreadsheet("RSID", rsidList,{
+      "row": {
+        1: {
+          "bgcolor": "#ebeced"
+        }
+      }
+    });
+
+  };    
+  
+  /**
+   * AdobeAnalyticsAPIController.prototype.sortRSIDData()
+   * Shaping the RSID data for output.
+   *
+   * @param {Object} data RSID data object
+   **/
+  AdobeAnalyticsAPIController.prototype.sortRSIDData = function(data) {
+
+    var data_array = [];
+
+    // set Title Header Line.
+    var data_title = ["RSID", "Name"];
+    data_array.push(data_title);
+
+
+    for (var i in data.report_suites) {
+      var sub_array = [];
+
+      sub_array.push(data.report_suites[i].rsid, data.report_suites[i].site_title);
+
+      data_array.push(sub_array);
+    }
+
+    return data_array;
+  }
+
+
+
   /**
    * AdobeAnalyticsAPIController.prototype.saveSpreadsheet()
    * Open spreadsheet and save the data to a spreadsheet.
@@ -533,6 +584,7 @@ function myFunction() {
   // save eVar,prop,events sheet
   //adobeAnalyticsController.saveSDR();
 
+
   // get eVar data and save eVar sheet
   //adobeAnalyticsController.saveEvarsList();
 
@@ -542,6 +594,8 @@ function myFunction() {
   // save events data and save events sheet
   //adobeAnalyticsController.saveEventsList();
 
+  // save RSID list
+  //adobeAnalyticsController.saveRSIDList();
 
   // get segments data and save segments sheet
   //   request setting: https://marketing.adobe.com/developer/documentation/segments-1-4/r-get-1
