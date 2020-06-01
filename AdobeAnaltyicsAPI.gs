@@ -6,27 +6,23 @@
 // =====================================
 
 
-// Configuration: Obtain AdobeAnalytics web API token
+// Configuration: Obtain AdobeAnalytics web API token (for v1.4)
 var API_TOKEN = "https://api.omniture.com/";
 var API_ENDPOINT = "https://api.omniture.com/admin/1.4/rest/";
+
 var SPREADSHEET_SHEETLIST = ["prop","eVar","events","segments","RSID"];
-var API_USERNAME = PropertiesService.getScriptProperties().getProperty('Analytics_api_username');
-var API_SECRETKEY = PropertiesService.getScriptProperties().getProperty('Analytics_api_secretkey');
 var FILE_SPREADSHEET = PropertiesService.getScriptProperties().getProperty('spreadsheet_path');
-var ANALYTICS_RSID = PropertiesService.getScriptProperties().getProperty('Analytics_reportsuite_id');
+
+var ANALYTICS_RSID = "";
+var API_KEY = "";   // same with "Client ID"
+var CLIENT_SECRET = "";
+var JWT_PAYLOAD = "";
+var PRIVATE_KEY = "";
+var GLOBAL_COMPANY_ID = "";
 
 // error handling
-if (!API_USERNAME) {
-  throw 'You should set "API_USERNAME" property from [File] > [Project properties] > [Script properties]';
-}
-if (!API_SECRETKEY) {
-  throw 'You should set "API_SECRETKEY" property from [File] > [Project properties] > [Script properties]';
-}
 if (!FILE_SPREADSHEET) {
   throw 'You should set "FILE_SPREADSHEET" property from [File] > [Project properties] > [Script properties]';
-}
-if (!ANALYTICS_RSID) {
-  throw 'You should set "ANALYTICS_RSID" property from [File] > [Project properties] > [Script properties]';
 }
 
 
@@ -36,14 +32,19 @@ var AdobeAnalyticsAPIController = (function() {
   function AdobeAnalyticsAPIController() {
 
     this.token_key = ""; //API Token key
+    this.access_token = ""; //Access Token
     this.setDebug = false; // if true, output log.
 
     //initialize spreadsheet
     this.initializeSpreadsheet();
 
     // get Access Token & Save
-    this.getToken();
-
+    //this.getToken();
+    
+    // get JWT Token
+    const jwtToken = this.getJwtToken();
+    this.getAccessToken(jwtToken);
+    
   };
 
   /**
@@ -76,28 +77,57 @@ var AdobeAnalyticsAPIController = (function() {
    * - set sheet(eVar/prop/events/segments)
    *
    **/
-   AdobeAnalyticsAPIController.prototype.initializeSpreadsheet = function(){
+  AdobeAnalyticsAPIController.prototype.initializeSpreadsheet = function(){
 
     // open spreadsheet
     var url = FILE_SPREADSHEET;
     var spreadsheet = SpreadsheetApp.openByUrl(url);
 
-
     // set default sheets list
     var sheets = spreadsheet.getSheets();
     var sheets_list = [];
-
     for(var i in sheets){
       sheets_list.push(sheets[i].getSheetName());
-    }
+    };
+
+    // get configrations from the sheet "Auth"
+    var sheet_auth = spreadsheet.getSheetByName("Auth");
+    if (!sheet_auth) {
+      throw 'You need "Auth" sheet that contains configuration valiables.';
+    };
+    var sheetdata = sheet_auth.getSheetValues(1, 1, 6, 2);
+    ANALYTICS_RSID = sheetdata[0][1];
+    API_KEY = sheetdata[1][1];
+    CLIENT_SECRET = sheetdata[2][1];
+    JWT_PAYLOAD = sheetdata[3][1];
+    PRIVATE_KEY = sheetdata[4][1];
+    GLOBAL_COMPANY_ID = sheetdata[5][1];
+
+    // check the above values
+    if (!ANALYTICS_RSID) {
+      throw 'You should set "Report Suite ID" property to the "Auth" sheet';
+    };
+    if (!API_KEY) {
+      throw 'You should set "API Key" property to the "Auth" sheet';
+    };
+    if (!CLIENT_SECRET) {
+      throw 'You should set "Client Secret" property to the "Auth" sheet';
+    };
+    if (!JWT_PAYLOAD) {
+      throw 'You should set "JWT Payload" property to the "Auth" sheet';
+    };
+    if (!PRIVATE_KEY) {
+      throw 'You should set "Private Key" property to the "Auth" sheet';
+    };
 
     for(var i in SPREADSHEET_SHEETLIST){
       if(sheets_list.indexOf(SPREADSHEET_SHEETLIST[i]) == -1){
-        spreadsheet.insertSheet(SPREADSHEET_SHEETLIST[i], i);
+        spreadsheet.insertSheet(SPREADSHEET_SHEETLIST[i], Number(i)+1);
       }
     }
+    //spreadsheet.setActiveSheet(spreadsheet.getSheetByName("prop"));
+    spreadsheet.setActiveSheet(spreadsheet.getSheetByName("Auth"));
 
-    spreadsheet.setActiveSheet(spreadsheet.getSheetByName("prop"));
   }
 
 
@@ -128,6 +158,67 @@ var AdobeAnalyticsAPIController = (function() {
 
   };
 
+
+  /**
+   * AdobeAnalyticsAPIController.prototype.getJwtToken()
+   * get JSON Web Token
+   *
+   * @return {String} JSON Web Token
+   **/
+  AdobeAnalyticsAPIController.prototype.getJwtToken = function () {
+  
+    this.Logger("", {
+      "title": "getJwtToekn"
+    });
+
+    const header = Utilities.base64Encode(JSON.stringify({"alg":"RS256","typ":"JWT"}), Utilities.Charset.UTF_8);
+    const myJwtPayload = JSON.parse(JWT_PAYLOAD);
+    myJwtPayload.exp = Math.floor(Date.now() / 1000 + 600) // expire after 10 minutes (600 sec)
+    const claimSet = JSON.stringify(myJwtPayload);
+    const encodeText = header + "." + Utilities.base64Encode(claimSet, Utilities.Charset.UTF_8).slice(0, -2);
+    const signature = Utilities.computeRsaSha256Signature(encodeText, PRIVATE_KEY);
+    const jwtToken = encodeText + "." + Utilities.base64Encode(signature).slice(0, -2);
+    this.Logger(jwtToken, {
+      "prefix": "JWT Token"
+    });
+
+    return jwtToken;
+  
+  };
+  
+  /**
+   * AdobeAnalyticsAPIController.prototype.getAccessToken()
+   * get Analytics Report API Access Token
+   *
+   * @param {String} JSON Web Token
+   * @return {String} Access Token
+   **/
+  AdobeAnalyticsAPIController.prototype.getAccessToken = function(jwtToken) {
+
+    this.Logger(jwtToken, {
+      "title": "getAccessToken"
+    });
+
+    const url = 'https://ims-na1.adobelogin.com/ims/exchange/jwt';
+    const payload = {
+      "client_id" : API_KEY,
+      "client_secret" : CLIENT_SECRET,
+//      "jwt_token" : Utilities.base64Encode(jwtToken, Utilities.Charset.UTF_8)
+      "jwt_token" : jwtToken
+    };
+    const options = {
+      'method': 'post',
+      'headers': {'Content-Type' : 'application/x-www-form-urlencoded', 'Cache-Control' : 'no-cache'},
+      "payload": payload
+    };
+    const body = UrlFetchApp.fetch(url, options);
+    this.access_token = JSON.parse(body).access_token;
+    this.Logger(this.access_token, {
+      "prefix": "Access Token"
+    });
+  
+  };
+  
   /**
    * AdobeAnalyticsAPIController.prototype.execRequest()
    * execute Request API
@@ -141,13 +232,23 @@ var AdobeAnalyticsAPIController = (function() {
       "title": "execRequest"
     });
 
+    const headers = {
+      'Accecpt' : 'application/json',
+      'Authorization' : 'Bearer ' + this.access_token,
+      'Content-Type' : 'application/json',
+      'x-api-key' : API_KEY,
+      'x-proxy-global-company-id' : GLOBAL_COMPANY_ID
+    }
+    
     var options = {
       "method": "POST",
+      "headers" : headers,
       "payload": JSON.stringify(data),
       "muteHttpExceptions": false
     }
 
-    var send_url = API_ENDPOINT + "?" + "method=" + method + "&access_token=" + this.token_key;
+    //var send_url = API_ENDPOINT + "?" + "method=" + method + "&access_token=" + this.token_key;
+    var send_url = API_ENDPOINT + "?" + "method=" + method;
     this.Logger(send_url, {
       "prefix": "Request URL"
     });
@@ -159,7 +260,65 @@ var AdobeAnalyticsAPIController = (function() {
 
   };
 
+  
+  /**
+   * AdobeAnalyticsAPIController.prototype.checkGlobalCompanyId()
+   * test your access token and get your global company IDs
+   *
+   * e.g. for curl: 
+   * curl -X GET --header "Accept: application/json" --header "x-api-key: {CLIENT ID}" --header "Authorization: Bearer {ACCESS_TOKEN}" "https://analytics.adobe.io/discovery/me"
+   * (see, https://www.adobe.io/apis/experiencecloud/analytics/docs.html#!AdobeDocs/analytics-2.0-apis/master/oauth-curl.md)
+   *
+   **/
+  AdobeAnalyticsAPIController.prototype.checkGlobalCompanyId = function() {
 
+    this.Logger("", {
+      "title": "checkGlobalCompanyId"
+    });
+
+    const headers = {
+      'Accecpt' : 'application/json',
+      'x-api-key' : API_KEY,
+      'Authorization' : 'Bearer ' + this.access_token
+    };
+
+    const payload = {};
+    
+    const options = {
+      'method': 'get',
+      'headers': headers
+    };
+
+    const url = "https://analytics.adobe.io/discovery/me";
+    
+    this.Logger(url, {
+      "prefix": "Request URL"
+    });
+    this.Logger(JSON.stringify(options), {
+      "prefix": "options"
+    });
+
+    const body = UrlFetchApp.fetch(url, options);
+    this.Logger(body, {
+      "prefix": "body"
+    });
+
+    var data = JSON.parse(body.getContentText("UTF-8"));
+
+    // save returned values to the sheet "Auth" (next to "Result of the function "checkGlobalCompanyId"")
+    var spreadsheetUrl = FILE_SPREADSHEET;
+    var spreadsheet = SpreadsheetApp.openByUrl(spreadsheetUrl);
+    var sheets = spreadsheet.getSheets();
+    for (var i in sheets) {
+      if (sheets[i].getSheetName() == "Auth") {
+        var sheet = sheets[i];
+        sheet.getRange(7, 2).setValue(JSON.stringify(data));
+      };
+    };
+    
+  };
+
+  
   /**
    * AdobeAnalyticsAPIController.prototype.savePropsList()
    * get Props List from define RSID & save Spreadsheet.
@@ -264,8 +423,6 @@ var AdobeAnalyticsAPIController = (function() {
 
     return data_array;
   }
-
-
 
 
   /**
@@ -488,7 +645,6 @@ var AdobeAnalyticsAPIController = (function() {
   }
 
 
-
   /**
    * AdobeAnalyticsAPIController.prototype.saveSpreadsheet()
    * Open spreadsheet and save the data to a spreadsheet.
@@ -577,13 +733,24 @@ var AdobeAnalyticsAPIController = (function() {
 })();
 
 
+function checkGlobalCompanyId () {
+  var adobeAnalyticsController = new AdobeAnalyticsAPIController();
+  // get Global Company ID (run the test script on the help page, https://www.adobe.io/apis/experiencecloud/analytics/docs.html#!AdobeDocs/analytics-2.0-apis/master/oauth-curl.md)
+  adobeAnalyticsController.checkGlobalCompanyId();
+  
+};  
+
 
 function myFunction() {
   var adobeAnalyticsController = new AdobeAnalyticsAPIController();
 
+  // check the above values
+  if (!GLOBAL_COMPANY_ID) {
+    throw 'You should set "Global Copmany ID" property to the "Auth" sheet. You can check your global company ID by executing the function "checkGlobalCompanyId."';
+  };
+  
   // save eVar,prop,events sheet
   //adobeAnalyticsController.saveSDR();
-
 
   // get eVar data and save eVar sheet
   //adobeAnalyticsController.saveEvarsList();

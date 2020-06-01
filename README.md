@@ -17,19 +17,9 @@ but, this is very easy to use. So, please download code and have fun!
 - Google Account
 - Adobe Analytics Account(Company)
   - please enable "use API service" roll your Adobe Analytics Account.
-- Adobe Developer Connection Account & create application.
-  - if you don't have please create account or application, please see below.
-  - please get secretkey & username.
-
-### Adobe Developer Connection
-Please regist Adobe Developer account & create application
-- [Create an application](https://marketing.adobe.com/developer/documentation/authentication-1/auth-register-app-1)
-  - please select target organizations.
-  - please add "Reportsuite" and "Report" Scope.
-
-> if you can't find organizations, your adobe ID don't added marketing cloud organizations.
-> Please contact account administrator and request Adobe marketing cloud invitation.
-
+- Adobe I/O
+  - You need to create a new Adobe Analytics API project from Adobe I/O Console (https://console.adobe.io). Please check the following link for more details,
+https://www.adobe.io/apis/experiencecloud/analytics/docs.html#!AdobeDocs/analytics-2.0-apis/master/create-oauth-client.md
 
 
 ## Usage
@@ -42,12 +32,24 @@ Please regist Adobe Developer account & create application
 | property name | value |
 |-----|-----|
 | spreadsheet_path | spreadsheet file path.(create new spreadsheet file and copy URL) |
-| Analytics_api_secretkey | your application (in Adobe Developer Connection) secret key. |
-| Analytics_api_username | your application (in Adobe Developer Connection) user name. |
-| Analytics_reportsuite_id | Report Suite ID you want to get the data. |
 
-4. customized myFunction() (please write code that you want to run here.)
-5. run "myFuntion()"
+4. create a new sheet named "Auth", then set the following parameters on the sheet.
+
+|  | A | B |
+|:------|:------|:------|
+| 1 | Report Suite ID | データ取得元のレポートスイートID（複数ある場合はカンマ区切りで列挙） |
+| 2 | API Key | Adobe Analytics API project の Client ID (API Key と Client ID は同じ値です) |
+| 3 | Client Secret | Adobe Analytics API project の Client Secret |
+| 4 | JWT Payload | Adobe Analytics API project にて、Service Account (JWT) > Generate JWT で作成した JWT Payload |
+| 5 | Private Key | Adobe Analytics API project 作成時に利用した秘密鍵 |
+| 6 | Global Company ID | あなたのアカウントの Global Company ID. 不明な場合は、一度 "checkGlobalCompanyId" を実行して確認してください |
+| 7 | Result of the function "checkGlobalCompanyId" | 【記入不要】関数 "checkGlobalCompanyId" を実行すると結果が自動で入力されます |
+
+Example,
+
+
+5. customized myFunction() (please write code that you want to run here.)
+6. run "myFuntion()"
 
 
 ## Feature
@@ -91,35 +93,26 @@ update segments data from "segments" spreadsheet.
 ## Author
 
 [manji6](https://github.com/manji6)
+[oriken](https://github.com/oriken)
 
 
 ===
-このコードはAdobe AnalyticsのAPIを操作するGoogle Apps Scriptです。
+このコードは Adobe Analytics の API v1.4 を操作する Google Apps Script です。
 
 ## Description
-このコードにはGoogle Apps Script上で動くように幾つかの関数が準備されております。
+このコードには Google Apps Script 上で動くように幾つかの関数が準備されております。
 
 ## Demo
 ごめんなさい、Demo環境は用意出来ていません。
 でも使い方は簡単なので、ダウンロードして使ってみてください。
 
 ## Requirement
-- Google Account(Google Driveが使える)
-- Adobe Analytics Account(Company)
+- Google Account (Google Driveが使える)
+- Adobe Analytics Account (Company)
   - 自分のアカウントがAPIサービスを利用できるようになっていること
-- Adobe Developer Connection Account & create application.
-  - もしAdobe Developer Connectionのアカウントやアプリケーションを作る場合は、下のリンクを確認してください。
-  - アカウントとアプリケーションを作成したら、シークレットキーとユーザーIDをメモしておいてください。
-
-### Adobe Developer Connection
-Adobe Developer Accountの作成とApplicationの登録をしてください。
-- [Create an application](https://marketing.adobe.com/developer/documentation/authentication-1/auth-register-app-1)
-  - 実行する対象となる組織を選択してください。
-  - Scopeに "Reportsuite" と "Report" を追加してください。
-
-> もし組織が見当たらない場合、あなたのAdobe IDはまだ該当のMarketing Cloud 組織に登録されていない可能性があります。
-> 自社のAdobe Markting Cloud 管理者に連絡し、自分のメールアドレスを招待してもらってください。
-
+- Adobe I/O
+  - Adobe I/O コンソールにて Adobe Analytics API の Project を作成し、Client ID, Client Secret, Technical Account ID 等を準備する必要があります。詳しくは以下をご覧ください。
+https://www.adobe.io/apis/experiencecloud/analytics/docs.html#!AdobeDocs/analytics-2.0-apis/master/create-oauth-client.md
 
 ## Usage
 
@@ -131,12 +124,25 @@ Adobe Developer Accountの作成とApplicationの登録をしてください。
 | property name | value |
 |:------|:------|
 | spreadsheet_path | 保存するスプレッドシートのパス(新規スプレッドシートを作成してURLをコピー＆貼り付け) |
-| Analytics_api_secretkey | Adobe Developer's connectionで作った Application の secret key. |
-| Analytics_api_username | Adobe Developer's connectionで作った Application の ユーザ名. |
-| Analytics_reportsuite_id | データ取得元のレポートスイートID |
 
-4. myFuntion()の中身を実行したい内容に応じてカスタマイズしてください。(下に関数リストを書きました)
-5. myFunction()を実行してください。
+4. 3. で指定したスプレッドシートに、「Auth」というシートを作成し、以下の値を設定してください
+
+|  | A | B |
+|:------|:------|:------|
+| 1 | Report Suite ID | データ取得元のレポートスイートID（複数ある場合はカンマ区切りで列挙） |
+| 2 | API Key | Adobe Analytics API project の Client ID (API Key と Client ID は同じ値です) |
+| 3 | Client Secret | Adobe Analytics API project の Client Secret |
+| 4 | JWT Payload | Adobe Analytics API project にて、Service Account (JWT) > Generate JWT で作成した JWT Payload |
+| 5 | Private Key | Adobe Analytics API project 作成時に利用した秘密鍵 |
+| 6 | Global Company ID | あなたのアカウントの Global Company ID. 不明な場合は、一度 "checkGlobalCompanyId" を実行して確認してください |
+| 7 | Result of the function "checkGlobalCompanyId" | 【記入不要】関数 "checkGlobalCompanyId" を実行すると結果が自動で入力されます |
+
+例
+
+
+5. myFuntion()の中身を実行したい内容に応じてカスタマイズしてください。(下に関数リストを書きました)
+6. myFunction()を実行してください。
+
 
 
 ## Feature
@@ -180,3 +186,4 @@ events データをレポートスイートから取り出してスプレッド�
 ## Author
 
 [manji6](https://github.com/manji6)
+[oriken](https://github.com/oriken)
