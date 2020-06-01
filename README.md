@@ -37,15 +37,16 @@ https://www.adobe.io/apis/experiencecloud/analytics/docs.html#!AdobeDocs/analyti
 
 |  | A | B |
 |:------|:------|:------|
-| 1 | Report Suite ID | データ取得元のレポートスイートID（複数ある場合はカンマ区切りで列挙） |
-| 2 | API Key | Adobe Analytics API project の Client ID (API Key と Client ID は同じ値です) |
-| 3 | Client Secret | Adobe Analytics API project の Client Secret |
-| 4 | JWT Payload | Adobe Analytics API project にて、Service Account (JWT) > Generate JWT で作成した JWT Payload |
-| 5 | Private Key | Adobe Analytics API project 作成時に利用した秘密鍵 |
-| 6 | Global Company ID | あなたのアカウントの Global Company ID. 不明な場合は、一度 "checkGlobalCompanyId" を実行して確認してください |
-| 7 | Result of the function "checkGlobalCompanyId" | 【記入不要】関数 "checkGlobalCompanyId" を実行すると結果が自動で入力されます |
+| 1 | Report Suite ID | Report Suite ID(s) that you want to get the data. (you can set multiple report suite IDs with comma-delimited.) |
+| 2 | API Key | Client ID of your Adobe Analytics API project (the same with API Key) |
+| 3 | Client Secret | Client Secret of your Adobe Analytics API project |
+| 4 | JWT Payload | JWT Payload of your Adobe Analytics API project. You can find it from Service Account (JWT) > Generate JWT |
+| 5 | Private Key | Private key that is used for creating your Adobe Analytics API project |
+| 6 | Global Company ID | Your Global Company ID. You can check your global company ID by running the funciton "checkGlobalCompanyId" |
+| 7 | Result of the function "checkGlobalCompanyId" | (Leave this blank) The response of running the function "checkGlobalCompanyId" is stored here automatically |
 
 Example,
+![Google Spreadsheet](https://github.com/oriken/AdobeAnalyticsAPIforGAS/blob/master/sheet_auth.png)
 
 
 5. customized myFunction() (please write code that you want to run here.)
@@ -92,8 +93,7 @@ update segments data from "segments" spreadsheet.
 
 ## Author
 
-[manji6](https://github.com/manji6)
-[oriken](https://github.com/oriken)
+[manji6](https://github.com/manji6), [oriken](https://github.com/oriken)
 
 
 ===
@@ -138,7 +138,7 @@ https://www.adobe.io/apis/experiencecloud/analytics/docs.html#!AdobeDocs/analyti
 | 7 | Result of the function "checkGlobalCompanyId" | 【記入不要】関数 "checkGlobalCompanyId" を実行すると結果が自動で入力されます |
 
 例
-
+![Google Spreadsheet](https://github.com/oriken/AdobeAnalyticsAPIforGAS/blob/master/sheet_auth.png)
 
 5. myFuntion()の中身を実行したい内容に応じてカスタマイズしてください。(下に関数リストを書きました)
 6. myFunction()を実行してください。
@@ -185,5 +185,4 @@ events データをレポートスイートから取り出してスプレッド�
 
 ## Author
 
-[manji6](https://github.com/manji6)
-[oriken](https://github.com/oriken)
+[manji6](https://github.com/manji6), [oriken](https://github.com/oriken)
