@@ -96,7 +96,7 @@ update segments data from "segments" spreadsheet.
 [manji6](https://github.com/manji6), [oriken](https://github.com/oriken)
 
 
-===
+---
 
 このコードは Adobe Analytics の API (v1.4) を操作する Google Apps Script です。
 
