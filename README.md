@@ -4,7 +4,7 @@
 
 ====
 
-This is Adobe Analytics API Controller utility script for Google Apps Script.
+This is Adobe Analytics API (v1.4) Controller utility script for Google Apps Script.
 
 ## Description
 This code include some function and runs on Google Apps Script.
@@ -97,7 +97,8 @@ update segments data from "segments" spreadsheet.
 
 
 ===
-このコードは Adobe Analytics の API v1.4 を操作する Google Apps Script です。
+
+このコードは Adobe Analytics の API (v1.4) を操作する Google Apps Script です。
 
 ## Description
 このコードには Google Apps Script 上で動くように幾つかの関数が準備されております。
