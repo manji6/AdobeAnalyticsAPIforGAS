@@ -168,7 +168,7 @@ var AdobeAnalyticsAPIController = (function() {
   AdobeAnalyticsAPIController.prototype.getJwtToken = function () {
   
     this.Logger("", {
-      "title": "getJwtToekn"
+      "title": "getJwtToken"
     });
 
     const header = Utilities.base64Encode(JSON.stringify({"alg":"RS256","typ":"JWT"}), Utilities.Charset.UTF_8);
@@ -203,7 +203,6 @@ var AdobeAnalyticsAPIController = (function() {
     const payload = {
       "client_id" : API_KEY,
       "client_secret" : CLIENT_SECRET,
-//      "jwt_token" : Utilities.base64Encode(jwtToken, Utilities.Charset.UTF_8)
       "jwt_token" : jwtToken
     };
     const options = {
@@ -305,7 +304,7 @@ var AdobeAnalyticsAPIController = (function() {
 
     var data = JSON.parse(body.getContentText("UTF-8"));
 
-    // save returned values to the sheet "Auth" (next to "Result of the function "checkGlobalCompanyId"")
+    // save returned values to the sheet named "Auth"
     var spreadsheetUrl = FILE_SPREADSHEET;
     var spreadsheet = SpreadsheetApp.openByUrl(spreadsheetUrl);
     var sheets = spreadsheet.getSheets();
